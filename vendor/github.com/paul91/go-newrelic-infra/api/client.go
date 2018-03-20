@@ -45,7 +45,7 @@ func New(config Config) Client {
 
 	baseURL := config.BaseURL
 	if baseURL == "" {
-		baseURL = "https://api.newrelic.com/v2"
+		baseURL = "https://infra-api.newrelic.com/v2"
 	}
 
 	r.SetHeader("X-Api-Key", config.APIKey)
@@ -68,9 +68,11 @@ func New(config Config) Client {
 // Do exectes an API request with the specified parameters.
 func (c *Client) Do(method string, path string, body interface{}, response interface{}) (string, error) {
 	r := c.RestyClient.R().
-		SetError(&ErrorResponse{})
+		SetError(&ErrorResponse{}).
+		SetHeader("Content-Type", "application/json")
 
 	if body != nil {
+		fmt.Printf("%+v\n", body)
 		r = r.SetBody(body)
 	}
 

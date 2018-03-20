@@ -604,10 +604,10 @@
 			"revisionTime": "2016-11-16T22:44:47Z"
 		},
 		{
-			"checksumSHA1": "8UonU0IfV3BjknE1g2mhZ4rTwBg=",
-			"path": "github.com/paultyng/go-newrelic/api",
-			"revision": "960e8b39399fe02c2bb58ce0498abec2564fdd1c",
-			"revisionTime": "2018-01-24T20:26:26Z"
+			"checksumSHA1": "PL/G4PzEUCqK+LXkxJIaH7r3z7E=",
+			"path": "github.com/paul91/go-newrelic-infra/api",
+			"revision": "03baf466d63a83c8b54604737742a5d74acb81a6",
+			"revisionTime": "2018-03-20T17:44:46Z"
 		},
 		{
 			"checksumSHA1": "u5s2PZ7fzCOqQX7bVPf9IJ+qNLQ=",
@@ -738,5 +738,5 @@
 			"versionExact": "v1.6.1"
 		}
 	],
-	"rootPath": "github.com/terraform-providers/terraform-provider-newrelic"
+	"rootPath": "github.com/terraform-providers/terraform-provider-newrelic-infra"
 }

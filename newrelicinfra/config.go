@@ -1,10 +1,10 @@
-package newrelic
+package newrelicinfra
 
 import (
 	"log"
 
 	"github.com/hashicorp/terraform/helper/logging"
-	newrelic "github.com/paultyng/go-newrelic/api"
+	newrelic "github.com/paul91/go-newrelic-infra/api"
 )
 
 // Config contains New Relic provider settings
@@ -23,7 +23,7 @@ func (c *Config) Client() (*newrelic.Client, error) {
 
 	client := newrelic.New(nrConfig)
 
-	log.Printf("[INFO] New Relic client configured")
+	log.Printf("[INFO] New Relic Infra client configured")
 
 	return &client, nil
 }

@@ -82,6 +82,27 @@ type AlertNrqlCondition struct {
 	Nrql          AlertNrqlQuery       `json:"nrql,omitempty"`
 }
 
+// AlertInfraThreshold represents an Infra alerting condition
+type AlertInfraThreshold struct {
+	Value    int    `json:"value,omitempty"`
+	Duration int    `json:"duration_minutes,omitempty"`
+	Function string `json:"time_function,omitempty"`
+}
+
+// AlertInfraCondition represents a New Relic Infra Alert condition.
+type AlertInfraCondition struct {
+	PolicyID   int    `json:"policy_id,omitempty"`
+	ID         int    `json:"id,omitempty"`
+	Name       string `json:"name,omitempty"`
+	Type       string `json:"type,omitempty"`
+	Comparison string `json:"comparison,omitempty"`
+	Enabled    bool   `json:"enabled,omitempty"`
+	Event      string `json:"event_type,omitempty"`
+	Select     string `json:"select_value,omitempty"`
+	// Warning    AlertInfraThreshold `json:"warning_threshold,omitempty"`
+	Critical AlertInfraThreshold `json:"critical_threshold,omitempty"`
+}
+
 // AlertSyntheticsCondition represents a New Relic NRQL Alert condition.
 type AlertSyntheticsCondition struct {
 	PolicyID   int    `json:"-"`

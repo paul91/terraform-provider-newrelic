@@ -1,4 +1,4 @@
-package newrelic
+package newrelicinfra
 
 import (
 	"log"
@@ -20,22 +20,12 @@ func Provider() terraform.ResourceProvider {
 			"api_url": {
 				Type:        schema.TypeString,
 				Optional:    true,
-				DefaultFunc: schema.EnvDefaultFunc("NEWRELIC_API_URL", "https://api.newrelic.com/v2"),
+				DefaultFunc: schema.EnvDefaultFunc("NEWRELIC_INFRA_API_URL", "https://infra-api.newrelic.com/v2"),
 			},
 		},
 
-		DataSourcesMap: map[string]*schema.Resource{
-			"newrelic_application":     dataSourceNewRelicApplication(),
-			"newrelic_key_transaction": dataSourceNewRelicKeyTransaction(),
-		},
-
 		ResourcesMap: map[string]*schema.Resource{
-			"newrelic_alert_channel":        resourceNewRelicAlertChannel(),
-			"newrelic_alert_condition":      resourceNewRelicAlertCondition(),
-			"newrelic_nrql_alert_condition": resourceNewRelicNrqlAlertCondition(),
-			"newrelic_alert_policy":         resourceNewRelicAlertPolicy(),
-			"newrelic_alert_policy_channel": resourceNewRelicAlertPolicyChannel(),
-			"newrelic_dashboard":            resourceNewRelicDashboard(),
+			"newrelic_infra_alert_condition": resourceNewRelicInfraAlertCondition(),
 		},
 
 		ConfigureFunc: providerConfigure,

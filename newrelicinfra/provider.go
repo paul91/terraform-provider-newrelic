@@ -25,7 +25,7 @@ func Provider() terraform.ResourceProvider {
 		},
 
 		ResourcesMap: map[string]*schema.Resource{
-			"newrelic_infra_alert_condition": resourceNewRelicInfraAlertCondition(),
+			"newrelicinfra_alert_condition": resourceNewRelicInfraAlertCondition(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -37,6 +37,6 @@ func providerConfigure(data *schema.ResourceData) (interface{}, error) {
 		APIKey: data.Get("api_key").(string),
 		APIURL: data.Get("api_url").(string),
 	}
-	log.Println("[INFO] Initializing New Relic client")
+	log.Println("[INFO] Initializing New Relic Infra client")
 	return config.Client()
 }

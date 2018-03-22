@@ -21,38 +21,38 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfig(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
-						"newrelic_infra_alert_condition.foo", "name", fmt.Sprintf("tf-test-%s", rName)),
+						"newrelicinfra_alert_condition.foo", "name", fmt.Sprintf("tf-test-%s", rName)),
 					// For some reason Enabled isn't being sent to the API?
 					// resource.TestCheckResourceAttr(
-					// 	"newrelic_infra_alert_condition.foo", "enabled", "false"),
+					// 	"newrelicinfra_alert_condition.foo", "enabled", "false"),
 					resource.TestCheckResourceAttr(
-						"newrelic_infra_alert_condition.foo", "critical.0.duration", "1"),
+						"newrelicinfra_alert_condition.foo", "critical.0.duration", "1"),
 				),
 			},
 			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
-						"newrelic_infra_alert_condition.foo", "name", fmt.Sprintf("tf-test-updated-%s", rName)),
+						"newrelicinfra_alert_condition.foo", "name", fmt.Sprintf("tf-test-updated-%s", rName)),
 				),
 			},
 			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
-						"newrelic_infra_alert_condition.foo", "warning.0.value", "5"),
+						"newrelicinfra_alert_condition.foo", "warning.0.value", "5"),
 				),
 			},
 			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, whereClause),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
-						"newrelic_infra_alert_condition.foo", "where", whereClause),
+						"newrelicinfra_alert_condition.foo", "where", whereClause),
 				),
 			},
 		},
@@ -64,7 +64,7 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 func testAccCheckNewRelicInfraAlertConditionDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*newrelic.Client)
 	for _, r := range s.RootModule().Resources {
-		if r.Type != "newrelic_infra_alert_condition" {
+		if r.Type != "newrelicinfra_alert_condition" {
 			continue
 		}
 
@@ -121,7 +121,7 @@ func testAccCheckNewRelicInfraAlertConditionExists(n string) resource.TestCheckF
 func testAccCheckNewRelicInfraAlertConditionConfig(rName string) string {
 	return fmt.Sprintf(`
 
-resource "newrelic_infra_alert_condition" "foo" {
+resource "newrelicinfra_alert_condition" "foo" {
   policy_id = "211629"
 
   name            = "tf-test-%[1]s"
@@ -145,7 +145,7 @@ resource "newrelic_infra_alert_condition" "foo" {
 func testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, where string) string {
 	return fmt.Sprintf(`
 
-resource "newrelic_infra_alert_condition" "foo" {
+resource "newrelicinfra_alert_condition" "foo" {
   policy_id = "211629"
 
   name            = "tf-test-%[1]s"
@@ -171,7 +171,7 @@ resource "newrelic_infra_alert_condition" "foo" {
 func testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName string) string {
 	return fmt.Sprintf(`
 
-resource "newrelic_infra_alert_condition" "foo" {
+resource "newrelicinfra_alert_condition" "foo" {
   policy_id = "211629"
 
   name            = "tf-test-%[1]s"
@@ -201,7 +201,7 @@ resource "newrelic_infra_alert_condition" "foo" {
 func testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName string) string {
 	return fmt.Sprintf(`
 
-resource "newrelic_infra_alert_condition" "foo" {
+resource "newrelicinfra_alert_condition" "foo" {
   policy_id = "211629"
 
   name            = "tf-test-updated-%[1]s"

@@ -22,7 +22,7 @@ func init() {
 	testAccExpectedApplicationName = fmt.Sprintf("tf_test_%s", acctest.RandString(10))
 	testAccProvider = Provider().(*schema.Provider)
 	testAccProviders = map[string]terraform.ResourceProvider{
-		"newrelic": testAccProvider,
+		"newrelicinfra": testAccProvider,
 	}
 }
 

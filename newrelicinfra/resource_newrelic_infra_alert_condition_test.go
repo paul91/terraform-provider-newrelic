@@ -38,6 +38,13 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 						"newrelic_infra_alert_condition.foo", "name", fmt.Sprintf("tf-test-updated-%s", rName)),
 				),
 			},
+			resource.TestStep{
+				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName),
+				Check: resource.ComposeTestCheckFunc(
+					resource.TestCheckResourceAttr(
+						"newrelic_infra_alert_condition.foo", "warning.0.value", "5"),
+				),
+			},
 		},
 	})
 }
@@ -120,6 +127,36 @@ resource "newrelic_infra_alert_condition" "foo" {
 	  duration = 1
 	  value = 10
 	  time_function = "any"
+  }
+}
+`, rName)
+}
+
+func testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName string) string {
+	return fmt.Sprintf(`
+
+resource "newrelic_infra_alert_condition" "foo" {
+  policy_id = "211629"
+
+  name            = "tf-test-%[1]s"
+  # TODO: Still need to fix enabled 
+  # enabled         = false
+
+  type            = "infra_metric"
+  event           = "StorageSample"
+  select          = "diskFreePercent"
+  comparison      = "below"
+
+  critical {
+	  duration = 1
+	  value = 10
+	  time_function = "any"
+  }
+
+  warning {
+	duration = 1
+	value = 5
+	time_function = "any"
   }
 }
 `, rName)

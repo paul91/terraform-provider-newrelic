@@ -10,27 +10,21 @@ import (
 
 // thresholdSchema returns the schema to use for threshold.
 //
-func thresholdSchema() *schema.Schema {
-	return &schema.Schema{
-		Type:     schema.TypeList,
-		MinItems: 1,
-		MaxItems: 1,
-		Required: true,
-		Elem: &schema.Resource{
-			Schema: map[string]*schema.Schema{
-				"value": {
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"duration": {
-					Type:     schema.TypeInt,
-					Optional: true,
-				},
-				"time_function": {
-					Type:         schema.TypeString,
-					Optional:     true,
-					ValidateFunc: validation.StringInSlice([]string{"any", "all"}, false),
-				},
+func thresholdSchema() *schema.Resource {
+	return &schema.Resource{
+		Schema: map[string]*schema.Schema{
+			"value": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"duration": {
+				Type:     schema.TypeInt,
+				Optional: true,
+			},
+			"time_function": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"any", "all"}, false),
 			},
 		},
 	}
@@ -79,26 +73,26 @@ func resourceNewRelicInfraAlertCondition() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"critical": thresholdSchema(),
+			"critical": {
+				Type:     schema.TypeList,
+				MinItems: 1,
+				MaxItems: 1,
+				Optional: true,
+				Elem:     thresholdSchema(),
+			},
+			"warning": &schema.Schema{
+				Type:     schema.TypeList,
+				Optional: true,
+				MaxItems: 1,
+				MinItems: 1,
+				ForceNew: true,
+				Elem:     thresholdSchema(),
+			},
 		},
 	}
 }
 
 func buildInfraAlertConditionStruct(d *schema.ResourceData) *newrelic.AlertInfraCondition {
-
-	critical := newrelic.AlertInfraThreshold{}
-
-	if valueQuery, ok := d.GetOk("critical.0.value"); ok {
-		critical.Value = valueQuery.(int)
-	}
-
-	if durationValue, ok := d.GetOk("critical.0.duration"); ok {
-		critical.Duration = durationValue.(int)
-	}
-
-	if functionValue, ok := d.GetOk("critical.0.time_function"); ok {
-		critical.Function = functionValue.(string)
-	}
 
 	condition := newrelic.AlertInfraCondition{
 		Name:       d.Get("name").(string),
@@ -108,7 +102,11 @@ func buildInfraAlertConditionStruct(d *schema.ResourceData) *newrelic.AlertInfra
 		Comparison: d.Get("comparison").(string),
 		Select:     d.Get("select").(string),
 		Type:       d.Get("type").(string),
-		Critical:   critical,
+		Critical:   expandAlertThreshold(d.Get("critical")),
+	}
+
+	if attr, ok := d.GetOk("warning"); ok {
+		condition.Warning = expandAlertThreshold(attr)
 	}
 
 	if v, ok := d.GetOk("enabled"); ok {
@@ -220,4 +218,19 @@ func resourceNewRelicInfraAlertConditionDelete(d *schema.ResourceData, meta inte
 	d.SetId("")
 
 	return nil
+}
+
+func expandAlertThreshold(v interface{}) *newrelic.AlertInfraThreshold {
+	alertInfraThreshold := &newrelic.AlertInfraThreshold{}
+	rsh := v.([]interface{})[0].(map[string]interface{})
+
+	if val, ok := rsh["value"]; ok {
+		alertInfraThreshold.Value = val.(int)
+	}
+
+	if val, ok := rsh["function"]; ok {
+		alertInfraThreshold.Function = val.(string)
+	}
+
+	return alertInfraThreshold
 }

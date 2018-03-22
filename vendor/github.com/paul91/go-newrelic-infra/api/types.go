@@ -99,6 +99,7 @@ type AlertInfraCondition struct {
 	Enabled    bool                 `json:"enabled,omitempty"`
 	Event      string               `json:"event_type,omitempty"`
 	Select     string               `json:"select_value,omitempty"`
+	Where      string               `json:"where_clause,omitempty"`
 	Warning    *AlertInfraThreshold `json:"warning_threshold,omitempty"`
 	Critical   *AlertInfraThreshold `json:"critical_threshold,omitempty"`
 }

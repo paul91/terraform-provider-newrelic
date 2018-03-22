@@ -12,6 +12,7 @@ import (
 
 func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 	rName := acctest.RandString(5)
+	whereClause := "hostname LIKE 'frontend'"
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
@@ -41,8 +42,17 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName),
 				Check: resource.ComposeTestCheckFunc(
+					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
 						"newrelic_infra_alert_condition.foo", "warning.0.value", "5"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, whereClause),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckNewRelicInfraAlertConditionExists("newrelic_infra_alert_condition.foo"),
+					resource.TestCheckResourceAttr(
+						"newrelic_infra_alert_condition.foo", "where", whereClause),
 				),
 			},
 		},
@@ -130,6 +140,32 @@ resource "newrelic_infra_alert_condition" "foo" {
   }
 }
 `, rName)
+}
+
+func testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, where string) string {
+	return fmt.Sprintf(`
+
+resource "newrelic_infra_alert_condition" "foo" {
+  policy_id = "211629"
+
+  name            = "tf-test-%[1]s"
+  # TODO: Still need to fix enabled 
+  # enabled         = false
+
+  type            = "infra_metric"
+  event           = "StorageSample"
+  select          = "diskFreePercent"
+  comparison      = "below"
+
+  where = "%[2]s"
+
+  critical {
+	  duration = 1
+	  value = 10
+	  time_function = "any"
+  }
+}
+`, rName, where)
 }
 
 func testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName string) string {

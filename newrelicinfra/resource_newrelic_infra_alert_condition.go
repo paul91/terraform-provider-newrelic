@@ -64,6 +64,10 @@ func resourceNewRelicInfraAlertCondition() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"where": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"comparison": {
 				Type:         schema.TypeString,
 				Optional:     true,
@@ -111,6 +115,10 @@ func buildInfraAlertConditionStruct(d *schema.ResourceData) *newrelic.AlertInfra
 
 	if v, ok := d.GetOk("enabled"); ok {
 		condition.Enabled = v.(bool)
+	}
+
+	if v, ok := d.GetOk("where"); ok {
+		condition.Where = v.(string)
 	}
 
 	return &condition

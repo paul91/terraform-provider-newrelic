@@ -147,6 +147,10 @@ func readInfraAlertConditionStruct(condition *newrelic.AlertInfraCondition, d *s
 	d.Set("created_at", condition.CreatedAt)
 	d.Set("updated_at", condition.UpdatedAt)
 
+	if condition.Where != "" {
+		d.Set("where", condition.Where)
+	}
+
 	if err := d.Set("critical", flattenAlertThreshold(condition.Critical)); err != nil {
 		return err
 	}

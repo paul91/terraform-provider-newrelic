@@ -12,14 +12,14 @@ import (
 
 func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 	rName := acctest.RandString(5)
-	whereClause := "hostname LIKE 'frontend'"
+	whereClause := "(`hostname` LIKE '%cassandra%')"
 	resource.Test(t, resource.TestCase{
 		PreCheck:     func() { testAccPreCheck(t) },
 		Providers:    testAccProviders,
 		CheckDestroy: testAccCheckNewRelicInfraAlertConditionDestroy,
 		Steps: []resource.TestStep{
 			resource.TestStep{
-				Config: testAccCheckNewRelicInfraAlertConditionConfig(rName),
+				Config: testAccCheckNewRelicInfraAlertConditionConfig(rName, whereClause),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
@@ -29,20 +29,16 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 					// 	"newrelicinfra_alert_condition.foo", "enabled", "false"),
 					resource.TestCheckResourceAttr(
 						"newrelicinfra_alert_condition.foo", "critical.0.duration", "10"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "where", whereClause),
 				),
 			},
 			resource.TestStep{
-				Config: testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName),
+				Config: testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName, whereClause),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
 						"newrelicinfra_alert_condition.foo", "name", fmt.Sprintf("tf-test-updated-%s", rName)),
-				),
-			},
-			resource.TestStep{
-				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, whereClause),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
 					resource.TestCheckResourceAttr(
 						"newrelicinfra_alert_condition.foo", "where", whereClause),
 				),
@@ -151,7 +147,7 @@ func testAccCheckNewRelicInfraAlertConditionExists(n string) resource.TestCheckF
 	}
 }
 
-func testAccCheckNewRelicInfraAlertConditionConfig(rName string) string {
+func testAccCheckNewRelicInfraAlertConditionConfig(rName, where string) string {
 	return fmt.Sprintf(`
 
 resource "newrelicinfra_alert_condition" "foo" {
@@ -165,32 +161,7 @@ resource "newrelicinfra_alert_condition" "foo" {
   event           = "StorageSample"
   select          = "diskFreePercent"
   comparison      = "below"
-
-  critical {
-	  duration = 10
-	  value = 10
-	  time_function = "any"
-  }
-}
-`, rName)
-}
-
-func testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, where string) string {
-	return fmt.Sprintf(`
-
-resource "newrelicinfra_alert_condition" "foo" {
-  policy_id = "211629"
-
-  name            = "tf-test-%[1]s"
-  # TODO: Still need to fix enabled 
-  # enabled         = false
-
-  type            = "infra_metric"
-  event           = "StorageSample"
-  select          = "diskFreePercent"
-  comparison      = "below"
-
-  where = "%[2]s"
+  where           = "%[2]s"
 
   critical {
 	  duration = 10
@@ -201,7 +172,7 @@ resource "newrelicinfra_alert_condition" "foo" {
 `, rName, where)
 }
 
-func testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName string) string {
+func testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName, where string) string {
 	return fmt.Sprintf(`
 
 resource "newrelicinfra_alert_condition" "foo" {
@@ -215,6 +186,7 @@ resource "newrelicinfra_alert_condition" "foo" {
   event           = "StorageSample"
   select          = "diskFreePercent"
   comparison      = "below"
+  where           = "%[2]s"
 
   critical {
 	  duration = 10
@@ -222,7 +194,7 @@ resource "newrelicinfra_alert_condition" "foo" {
 	  time_function = "any"
   }
 }
-`, rName)
+`, rName, where)
 }
 
 func testAccCheckNewRelicInfraAlertConditionConfigWithThreshold(rName string) string {

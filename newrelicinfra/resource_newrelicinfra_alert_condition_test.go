@@ -40,14 +40,6 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 				),
 			},
 			resource.TestStep{
-				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName),
-				Check: resource.ComposeTestCheckFunc(
-					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
-					resource.TestCheckResourceAttr(
-						"newrelicinfra_alert_condition.foo", "warning.0.value", "5"),
-				),
-			},
-			resource.TestStep{
 				Config: testAccCheckNewRelicInfraAlertConditionConfigWithWhere(rName, whereClause),
 				Check: resource.ComposeTestCheckFunc(
 					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
@@ -207,36 +199,6 @@ resource "newrelicinfra_alert_condition" "foo" {
   }
 }
 `, rName, where)
-}
-
-func testAccCheckNewRelicInfraAlertConditionConfigWithWarning(rName string) string {
-	return fmt.Sprintf(`
-
-resource "newrelicinfra_alert_condition" "foo" {
-  policy_id = "211629"
-
-  name            = "tf-test-%[1]s"
-  # TODO: Still need to fix enabled 
-  # enabled         = false
-
-  type            = "infra_metric"
-  event           = "StorageSample"
-  select          = "diskFreePercent"
-  comparison      = "below"
-
-  critical {
-	  duration = 10
-	  value = 10
-	  time_function = "any"
-  }
-
-  warning {
-	duration = 10
-	value = 5
-	time_function = "any"
-  }
-}
-`, rName)
 }
 
 func testAccCheckNewRelicInfraAlertConditionConfigUpdated(rName string) string {

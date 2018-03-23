@@ -58,6 +58,7 @@ func resourceNewRelicInfraAlertCondition() *schema.Resource {
 			"type": {
 				Type:         schema.TypeString,
 				Required:     true,
+				ForceNew:     true,
 				ValidateFunc: validation.StringInSlice([]string{"infra_process_running", "infra_metric", "infra_host_not_reporting"}, false),
 			},
 			"event": {
@@ -135,6 +136,16 @@ func readInfraAlertConditionStruct(condition *newrelic.AlertInfraCondition, d *s
 	d.Set("policy_id", policyID)
 	d.Set("name", condition.Name)
 	d.Set("enabled", condition.Enabled)
+
+	if err := d.Set("critical", flattenAlertThreshold(condition.Critical)); err != nil {
+		return err
+	}
+
+	if condition.Warning != nil {
+		if err := d.Set("warning", flattenAlertThreshold(condition.Warning)); err != nil {
+			return err
+		}
+	}
 
 	return nil
 }
@@ -229,16 +240,28 @@ func resourceNewRelicInfraAlertConditionDelete(d *schema.ResourceData, meta inte
 }
 
 func expandAlertThreshold(v interface{}) *newrelic.AlertInfraThreshold {
-	alertInfraThreshold := &newrelic.AlertInfraThreshold{}
-	rsh := v.([]interface{})[0].(map[string]interface{})
+	rah := v.([]interface{})[0].(map[string]interface{})
+	alertInfraThreshold := &newrelic.AlertInfraThreshold{
+		Duration: rah["duration"].(int),
+	}
 
-	if val, ok := rsh["value"]; ok {
+	if val, ok := rah["value"]; ok {
 		alertInfraThreshold.Value = val.(int)
 	}
 
-	if val, ok := rsh["function"]; ok {
+	if val, ok := rah["time_function"]; ok {
 		alertInfraThreshold.Function = val.(string)
 	}
 
 	return alertInfraThreshold
+}
+
+func flattenAlertThreshold(v *newrelic.AlertInfraThreshold) []interface{} {
+	alertInfraThreshold := map[string]interface{}{
+		"duration":      v.Duration,
+		"value":         v.Value,
+		"time_function": v.Function,
+	}
+
+	return []interface{}{alertInfraThreshold}
 }

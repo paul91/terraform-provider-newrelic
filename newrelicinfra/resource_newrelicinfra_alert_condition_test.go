@@ -28,7 +28,7 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 					// resource.TestCheckResourceAttr(
 					// 	"newrelicinfra_alert_condition.foo", "enabled", "false"),
 					resource.TestCheckResourceAttr(
-						"newrelicinfra_alert_condition.foo", "critical.0.duration", "1"),
+						"newrelicinfra_alert_condition.foo", "critical.0.duration", "10"),
 				),
 			},
 			resource.TestStep{
@@ -59,7 +59,48 @@ func TestAccNewRelicInfraAlertCondition_Basic(t *testing.T) {
 	})
 }
 
-// TODO: func_ TestAccNewRelicInfraAlertCondition_Multi(t *testing.T) {
+func TestAccNewRelicInfraAlertCondition_Thresholds(t *testing.T) {
+	rName := acctest.RandString(5)
+	resource.Test(t, resource.TestCase{
+		PreCheck:     func() { testAccPreCheck(t) },
+		Providers:    testAccProviders,
+		CheckDestroy: testAccCheckNewRelicInfraAlertConditionDestroy,
+		Steps: []resource.TestStep{
+			resource.TestStep{
+				Config: testAccCheckNewRelicInfraAlertConditionConfigWithThreshold(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "name", fmt.Sprintf("tf-test-%s", rName)),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.duration", "10"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.value", "10"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.time_function", "any"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "warning.0.value", "20"),
+				),
+			},
+			resource.TestStep{
+				Config: testAccCheckNewRelicInfraAlertConditionConfigWithThresholdUpdated(rName),
+				Check: resource.ComposeTestCheckFunc(
+					testAccCheckNewRelicInfraAlertConditionExists("newrelicinfra_alert_condition.foo"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "name", fmt.Sprintf("tf-test-%s", rName)),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.duration", "20"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.value", "15"),
+					resource.TestCheckResourceAttr(
+						"newrelicinfra_alert_condition.foo", "critical.0.time_function", "all"),
+					resource.TestCheckNoResourceAttr(
+						"newrelicinfra_alert_condition.foo", "warning"),
+				),
+			},
+		},
+	})
+}
 
 func testAccCheckNewRelicInfraAlertConditionDestroy(s *terraform.State) error {
 	client := testAccProvider.Meta().(*newrelic.Client)
@@ -134,7 +175,7 @@ resource "newrelicinfra_alert_condition" "foo" {
   comparison      = "below"
 
   critical {
-	  duration = 1
+	  duration = 10
 	  value = 10
 	  time_function = "any"
   }
@@ -160,7 +201,7 @@ resource "newrelicinfra_alert_condition" "foo" {
   where = "%[2]s"
 
   critical {
-	  duration = 1
+	  duration = 10
 	  value = 10
 	  time_function = "any"
   }
@@ -184,13 +225,13 @@ resource "newrelicinfra_alert_condition" "foo" {
   comparison      = "below"
 
   critical {
-	  duration = 1
+	  duration = 10
 	  value = 10
 	  time_function = "any"
   }
 
   warning {
-	duration = 1
+	duration = 10
 	value = 5
 	time_function = "any"
   }
@@ -214,7 +255,7 @@ resource "newrelicinfra_alert_condition" "foo" {
   comparison      = "below"
 
   critical {
-	  duration = 1
+	  duration = 10
 	  value = 10
 	  time_function = "any"
   }
@@ -222,4 +263,52 @@ resource "newrelicinfra_alert_condition" "foo" {
 `, rName)
 }
 
-// TODO: const testAccCheckNewRelicInfraAlertConditionConfigMulti = `
+func testAccCheckNewRelicInfraAlertConditionConfigWithThreshold(rName string) string {
+	return fmt.Sprintf(`
+
+resource "newrelicinfra_alert_condition" "foo" {
+  policy_id = "211629"
+
+  name            = "tf-test-%[1]s"
+
+  type            = "infra_metric"
+  event           = "StorageSample"
+  select          = "diskFreePercent"
+  comparison      = "below"
+
+  critical {
+	duration = 10
+	value = 10
+	time_function = "any"
+  }
+
+  warning {
+	duration = 10
+	value = 20
+	time_function = "any"
+  }
+}
+`, rName)
+}
+
+func testAccCheckNewRelicInfraAlertConditionConfigWithThresholdUpdated(rName string) string {
+	return fmt.Sprintf(`
+
+resource "newrelicinfra_alert_condition" "foo" {
+  policy_id = "211629"
+
+  name            = "tf-test-%[1]s"
+
+  type            = "infra_metric"
+  event           = "StorageSample"
+  select          = "diskFreePercent"
+  comparison      = "below"
+
+  critical {
+    duration = 20
+	value = 15
+	time_function = "all"
+  }
+}
+`, rName)
+}

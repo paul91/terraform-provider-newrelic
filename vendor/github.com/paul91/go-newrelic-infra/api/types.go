@@ -96,6 +96,8 @@ type AlertInfraCondition struct {
 	Name       string               `json:"name,omitempty"`
 	Type       string               `json:"type,omitempty"`
 	Comparison string               `json:"comparison,omitempty"`
+	CreatedAt  int                  `json:"created_at_epoch_millis,omitempty"`
+	UpdatedAt  int                  `json:"updated_at_epoch_millis,omitempty"`
 	Enabled    bool                 `json:"enabled,omitempty"`
 	Event      string               `json:"event_type,omitempty"`
 	Select     string               `json:"select_value,omitempty"`

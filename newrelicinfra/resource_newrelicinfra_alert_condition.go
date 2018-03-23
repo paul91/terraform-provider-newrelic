@@ -78,6 +78,14 @@ func resourceNewRelicInfraAlertCondition() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
+			"created_at": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
+			"updated_at": {
+				Type:     schema.TypeInt,
+				Computed: true,
+			},
 			"critical": {
 				Type:     schema.TypeList,
 				MinItems: 1,
@@ -136,6 +144,8 @@ func readInfraAlertConditionStruct(condition *newrelic.AlertInfraCondition, d *s
 	d.Set("policy_id", policyID)
 	d.Set("name", condition.Name)
 	d.Set("enabled", condition.Enabled)
+	d.Set("created_at", condition.CreatedAt)
+	d.Set("updated_at", condition.UpdatedAt)
 
 	if err := d.Set("critical", flattenAlertThreshold(condition.Critical)); err != nil {
 		return err
